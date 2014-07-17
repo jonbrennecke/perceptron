@@ -18,15 +18,22 @@
 int main (void)
 {
 
-	auto net = new machine::Network<double>( 2, 5 );
+	auto params = machine::Network::Parameters();
 
-	// net->setActivation( machine::hyperbolic_tan );
+	params
+		.inputs(10)
+		.outputs(15)
+		.biasTerm(true)
+		.rate(0.001)
+		.activation( machine::hyperbolic_tan )
+		.initialization( machine::random )
+		.propogation( machine::dotprod );
 
-	// net->setInitialization( machine::random );
+	auto net = new machine::Network( params );
 
-	// net->init();
+	// machine::nets::Classifier<std::string>( net );
+	// machine::stats::HiddenMarkovModel<std::string>();
 
-	// net->reset();
 
 
 
