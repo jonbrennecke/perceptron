@@ -1,3 +1,4 @@
+
 #ifndef NETWORK_H
 #define NETWORK_H
 
@@ -7,14 +8,14 @@
 #include <vector>
 #include <cmath>
 #include <random>
+#include <stdexcept>
+#include <iterator>
 
 
 namespace machine {
 
 	// forward declare our classes
 	class Network;
-	class Layer;
-	class Neuron;
 	struct ActFunction;
 
 	/**
@@ -46,8 +47,18 @@ namespace machine {
 	 */
 	struct ActFunction
 	{
-		act_handle dxdy;
-		act_handle dydx;
+		act_handle _dxdy;
+		act_handle _dydx;
+
+		double dxdy ( double x ) const
+		{
+			return (*this->_dxdy)(x);
+		}
+
+		double dydx ( double y ) const
+		{
+			return (*this->_dydx)(y);
+		}
 	};
 
 
@@ -95,46 +106,26 @@ namespace machine {
 
 	/**
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * 					Layer
+	 * 			Training functions
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * A layer of n 'neurons'
+	 * Training functions used to train the neural network
 	 *
+	 * training functions take 3 parameters:
+	 * :param input { std::vector<double> } - input to the network (i.e., input to feedForward)
+	 * :param expected { std::vector<double> } - expected output of the network (i.e., output of feedForward)
+	 * :param network { Network& } - the network to train
 	 */
-	class Layer
-	{
-	private:
-		friend class Network;
-		friend class Neuron;
-		Network &parent;
-		Layer* prev;
-		int index;
-		int nNeurons;
-		int nWeights;
-		std::vector<Neuron *> neurons;
 
-		// TODO
-		// http://stackoverflow.com/questions/8054273/how-to-implement-an-stl-style-iterator-and-avoid-common-pitfalls/8054856#8054856
-		// template <typename T> class iterator
-		// {
-		// public:
-		// 	iterator( const iterator& );
-		// 	~iterator();
-		// 	iterator& operator++();
-		// 	iterator& operator=( const iterator& );
-		// 	reference operator*() const;
-		// 	friend void swap(iterator& lhs, iterator& rhs);
-		// };
+	typedef std::shared_ptr<std::function<void(std::vector<double>, std::vector<double>, Network&)> > train_handle;
 
-	public:
+	// factory function to create type 'train_handle' function pointers
+	template <class F>
+	train_handle trainingFunctionFactory(F f) {
+	    return train_handle( new std::function<void(std::vector<double>, std::vector<double>, Network&)>(f) );
+	}
 
-		/**
-		 * :param nNeurons - dimension of the layer; eg. number of 'neurons'
-		 * :param nWeights - length of the layer; eg. dimension of the weight vector of each of n 'neurons'
-		 */
-		 
-		Layer ( int, int, Network&, int );
-		
-	};
+	// the default training function
+	extern train_handle backPropogation;
 
 
 	/**
@@ -143,7 +134,6 @@ namespace machine {
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 * by default, the Network class creates a multilayer feed-forward back-propogating network
 	 * with one hidden layer
-	 *
 	 *
 	 * see 	- http://en.wikipedia.org/wiki/Neural_network
 	 * 		- http://en.wikipedia.org/wiki/Deep_learning#Deep_neural_networks
@@ -154,6 +144,88 @@ namespace machine {
 	class Network 
 	{
 	public:
+
+		/**
+		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		 * 					Layer
+		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		 * A layer of n 'neurons'
+		 *
+		 */
+		class Layer
+		{
+		public:
+			
+			/**
+			 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			 *					Neuron
+			 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			 *
+			 * this could probably just be a vector within layer, instead of a seperate class
+			 */
+			class Neuron
+			{
+			public:
+				Neuron ( int, Network& );
+				~Neuron();
+				std::vector<double>::iterator begin();
+				std::vector<double>::iterator end();
+
+			private:
+				friend class Network;
+				friend class Layer;
+				Network &parent;
+				int nWeights;
+				std::vector<double> weights;
+			};
+
+			/**
+			 * :param nNeurons - dimension of the layer; eg. number of 'neurons'
+			 * :param nWeights - length of the layer; eg. dimension of the weight vector of each of n 'neurons'
+			 */
+			Layer ( int, int, Network&, int );
+			~Layer();
+			std::vector<double> getInput();
+			std::vector<double> getOutput();
+			std::vector<double> feedForward( std::vector<double> );
+			std::vector<Neuron*>::iterator begin();
+			std::vector<Neuron*>::iterator end();
+			int size();
+			int index;
+		
+		private:
+			friend class Network;
+			Network &parent;
+			Layer* prev;
+			int nNeurons;
+			int nWeights;
+			std::vector<Layer::Neuron *> neurons;
+			std::vector<double> input;	
+			std::vector<double> output;	
+		
+		}; // end class Layer
+
+		/**
+		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		 * 					Trainer
+		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		 *
+		 * TODO, do we need a seperate training nested class?
+		 * or can the training methods just be part of Network?
+		 */
+		class Trainer
+		{
+		public:
+			Trainer ( Network&, train_handle );
+			~Trainer();
+			void train ( std::vector<double>, std::vector<double> );
+
+		private:
+			// friend class Network;
+			// friend class Layer;
+			Network& network;
+			train_handle trainf;
+		};
 
 		/**
 		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -182,9 +254,11 @@ namespace machine {
 			ActFunction actf;
 			init_handle initf;
 			prop_handle propf;
+			train_handle trainf;
 
 		public:
 			Parameters();
+			~Parameters();
 			Parameters& inputs ( int );
 			Parameters& outputs ( int );
 			Parameters& hiddenLayers ( int );
@@ -194,35 +268,38 @@ namespace machine {
 			Parameters& activation ( ActFunction );
 			Parameters& initialization ( init_handle );
 			Parameters& propogation ( prop_handle );
+			Parameters& training ( train_handle );
 
 		}; // end class Parameters
 
 		Network ( const Parameters& );
+		~Network();
+
+		std::vector<double> feedForward ( std::vector<double> );
+		double propogate ( std::vector<double>, std::vector<double> );
+		const ActFunction& activate ();
+		void train ( std::vector<double>, std::vector<double> );
+		void toggleTrainingMode();
 		double init ();
+		int size ();
+		double rate ();
+
+		// iterator methods
+		std::vector<Layer*>::iterator begin();
+		std::vector<Layer*>::iterator end();
+		std::vector<Layer*>::reverse_iterator rbegin();
+		std::vector<Layer*>::reverse_iterator rend();
 
 	private:
 		friend class Layer;
+		friend class Trainer;
 		const Parameters& params;
 		unsigned int hiddenSize;
-	};
+		std::vector<Layer*> layers; // TODO this should be Layer&
+		Trainer* trainer;
+		bool training;
 
-
-	/**
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 *					Neuron
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 */
-	class Neuron
-	{
-	private:
-		friend class Network;
-		friend class Layer;
-		Network *parent;
-
-	public:
-		Neuron ( int, Network* );
-		
-	};
+	}; // end class Network
 }
 
 #endif
