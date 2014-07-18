@@ -116,27 +116,27 @@ namespace machine {
 			std::vector<double> layer_input = (*layer)->getInput();
 			std::vector<double> layer_output = (*layer)->getOutput();
 
-			std::vector<double> deltas((*layer)->size());
-
 			// iterate over the neurons in a vector
 			auto out = layer_output.begin();
 			for (auto neuron = (*layer)->begin(); neuron != (*layer)->end(); ++neuron, ++out)
 			{
 
-				if ( layer == net.rbegin() ) // output layer
+				// the output layer is handled a bit differently, as it can be compared directly with the 
+				// expected answer
+				auto ex = expected.begin();
+				auto in = layer_input.begin();
+				for (auto weight = (*neuron)->begin(); weight != (*neuron)->end(); ++weight, ++in, ++ex )
 				{
-					// the output layer is handled a bit differently, as it can be compared directly with the 
-					// expected answer
-					auto ex = expected.begin();
-					auto in = layer_input.begin();
-					for (auto weight = (*neuron)->begin(); weight != (*neuron)->end(); ++weight, ++in, ++ex )
-						double delta = rate * ((*out) - (*ex)) * actf.dydx((*out)) * (*in);
-				}
-				else // all other layers
-				{
+					// calculate the deltas of the weights
+					double delta = rate * ((*ex) - (*in)) * actf.dydx((*out)) * (*in);
+					(*weight) -= delta; 
 
 				}
 			}
+
+			// propogate the expected value down the chain by 
+			// recalculating the layer's output with the new weights
+			expected = (*layer)->feedForward( layer_input );
 		}
 	}
 
