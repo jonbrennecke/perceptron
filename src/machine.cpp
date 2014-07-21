@@ -15,10 +15,11 @@
 #include <iostream>
 
 #include "network.h"
-// #include "classifier.h"
 
 int main (void)
 {
+
+
 
 	auto params = machine::Network::Parameters();
 
@@ -34,12 +35,21 @@ int main (void)
 
 	auto net = machine::Network( params );
 
-	std::vector<double> input = { 1.0, 2.0, 3.0, 4.0 };
-	std::vector<double> expected = { 1.0, 2.0 };
+	// net.save( "testsave.bin" );
 
-	net.toggleTrainingMode();
+	for (auto it = net.begin(); it != net.end(); ++it)
+	{
+		std::cout << (*it)->size() << std::endl;
+	}
 
-	net.train( input, expected );
+	// std::vector<double> input = { 1.0, 2.0, 3.0, 4.0 };
+	// std::vector<double> expected = { 1.0, 2.0 };
+
+	// net.toggleTrainingMode();
+
+	// net.train( input, expected );
+
+
 
 
 

@@ -1,16 +1,28 @@
+/**
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * 							Artificial Neural Network Base Classes
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * by jonbrennecke / https://github.com/jonbrennecke
+ *
+ */
 
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#include <memory>
+#include <functional>
 #include <typeinfo>
-#include <map>
-#include <string>
 #include <vector>
 #include <cmath>
 #include <random>
 #include <stdexcept>
 #include <iterator>
+#include <fstream>
 
+#include "machine.h"
+
+// #include "stateinfo.h"
 
 namespace machine {
 
@@ -129,9 +141,9 @@ namespace machine {
 
 
 	/**
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * 				Neural Network
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 * 									Neural Network
+	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 * by default, the Network class creates a multilayer feed-forward back-propogating network
 	 * with one hidden layer
 	 *
@@ -141,7 +153,7 @@ namespace machine {
 	 *		- http://www.faqs.org/faqs/ai-faq/neural-nets/part1/preamble.html
 	 *
 	 */
-	class Network 
+	class Network : public Serializable
 	{
 	public:
 
@@ -161,7 +173,9 @@ namespace machine {
 			 *					Neuron
 			 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			 *
-			 * this could probably just be a vector within layer, instead of a seperate class
+			 * right now, this could probably just be a vector within Layer, instead of a seperate class
+			 * but we'll probably need it to be its own class later on when we get to more complicated networks
+			 * so it exists for now.
 			 */
 			class Neuron
 			{
@@ -192,11 +206,14 @@ namespace machine {
 			std::vector<Neuron*>::iterator end();
 			int size();
 			int index;
+
+			// stream operators for serializing the layer
+			friend std::ostream& operator<<( std::ostream&, const Layer& );
+			friend std::istream& operator>>( std::istream&, Layer& );
 		
 		private:
 			friend class Network;
 			Network &parent;
-			Layer* prev;
 			int nNeurons;
 			int nWeights;
 			std::vector<Layer::Neuron *> neurons;
@@ -204,28 +221,6 @@ namespace machine {
 			std::vector<double> output;	
 		
 		}; // end class Layer
-
-		/**
-		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		 * 					Trainer
-		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		 *
-		 * TODO, do we need a seperate training nested class?
-		 * or can the training methods just be part of Network?
-		 */
-		class Trainer
-		{
-		public:
-			Trainer ( Network&, train_handle );
-			~Trainer();
-			void train ( std::vector<double>, std::vector<double> );
-
-		private:
-			// friend class Network;
-			// friend class Layer;
-			Network& network;
-			train_handle trainf;
-		};
 
 		/**
 		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,8 +232,10 @@ namespace machine {
 		 * :param nInputs - size of the input vector
 		 * :param nOutputs - size of the output vector
 		 * :param nHiddenLayers - number of hidden layers
+		 * :param hiddenSize - size of each hidden layer (default is the floor of the mean of the input and output layer's size)
 		 * :param actf - activation function (default is the sigmoid function)
 		 * :param initf - initialization function (default is random)
+		 * :param trainf - training function (default is backPropogation)
 		 */
 		class Parameters
 		{
@@ -272,7 +269,42 @@ namespace machine {
 
 		}; // end class Parameters
 
+		/**
+		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		 * 					Layer Iterator
+		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		 *
+		 * provides an STL-like iterater over the Layers, except that we don't need templates here since 
+		 *
+		 * see
+		 *		http://stackoverflow.com/questions/8054273/how-to-implement-an-stl-style-iterator-and-avoid-common-pitfalls/8054856#8054856
+		 *		http://www.dreamincode.net/forums/topic/58468-making-your-own-iterators/
+		 */
+		struct iterator
+		{
+			typedef iterator self_type;
+			typedef Layer value_type;
+			typedef Layer& reference;
+			typedef Layer* pointer;
+			typedef std::forward_iterator_tag iterator_category;
+			typedef int difference_type;
+
+			iterator( pointer );
+			~iterator();
+			
+			self_type operator++(); 
+			self_type operator++( int i );
+			reference operator*();
+			pointer operator->();
+			bool operator==(const self_type& rhs);
+			bool operator!=(const self_type& rhs);
+
+		private:
+			pointer ptr_;
+		};
+
 		Network ( const Parameters& );
+		Network ( std::string, const Parameters& );
 		~Network();
 
 		std::vector<double> feedForward ( std::vector<double> );
@@ -283,6 +315,12 @@ namespace machine {
 		double init ();
 		int size ();
 		double rate ();
+		void save ( std::string );
+		void load ( std::string );
+
+		// stream operators
+		friend std::ostream& operator<<( std::ostream&, const Network& );
+		friend std::istream& operator>>( std::istream&, Network& );
 
 		// iterator methods
 		std::vector<Layer*>::iterator begin();
@@ -293,10 +331,10 @@ namespace machine {
 	private:
 		friend class Layer;
 		friend class Trainer;
+		
 		const Parameters& params;
-		unsigned int hiddenSize;
 		std::vector<Layer*> layers; // TODO this should be Layer&
-		Trainer* trainer;
+		train_handle trainf;
 		bool training;
 
 	}; // end class Network

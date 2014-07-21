@@ -1,23 +1,35 @@
+/**
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * 								Network Objects
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Implementations for the classes defined in 'network.h'
+ *
+ * by jonbrennecke / https://github.com/jonbrennecke
+ *
+ */
+
 
 #include <typeinfo>
-#include <map>
-#include <string>
 #include <vector>
 #include <cmath>
 #include <random>
 #include <stdexcept>
+#include <fstream>
+
+ #include <iostream>
 
 #include "network.h"
 
 namespace machine {
-	
+
 	/**
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 * 				Parameters
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 */
 	Network::Parameters::Parameters() 
-		: __inputs(3), __outputs(5), __hiddenLayers(1), __hiddenSize(0), actf(sigmoid), initf(random), __biasTerm(true), __rate(0.001) {}
+		: __inputs(3), __outputs(5), __hiddenLayers(1), __hiddenSize(0), __biasTerm(true), __rate(0.001), actf(sigmoid), initf(random) {}
 	
 	Network::Parameters::~Parameters() {}
 
@@ -85,12 +97,12 @@ namespace machine {
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 * 					Network
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 *
+	 * construct a network from a Parameters object
+	 *
 	 */
 	Network::Network ( const Network::Parameters& params ) : params(params), training(false)
 	{
-		// initialize the trainer
-		this->trainer = new Network::Trainer( *this, this->params.trainf );
-
 		// initialize the layers
 		this->layers = std::vector<Network::Layer*>( this->params.__hiddenLayers + 2 );
 
@@ -129,7 +141,58 @@ namespace machine {
 	
 	}
 
+	/**
+	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 * 					Network
+	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 *
+	 * construct a network from a saved binary file
+	 *
+	 */
+	Network::Network( std::string file, const Network::Parameters& params ) : params(params), training(false)
+	{
+		
+	};
+
 	Network::~Network(){};
+
+	void Network::load ( std::string file )
+	{
+
+	}
+
+	// 
+	void Network::save ( std::string file )
+	{
+		std::ofstream out( file, std::ios::out | std::ios::binary );
+		if ( out )
+		{
+			out << *this;
+			out.close();
+		}
+		else
+		{
+			// throw an error or something
+		}
+	}
+
+	std::ostream& operator<< ( std::ostream& os, const Network& net )
+	{
+		// serialize the layers and the parameters
+		// for (auto layer = net.begin(); layer != net.end(); ++layer)
+		// {
+		// 	os << (*layer);
+		// }
+		// out.write( reinterpret_cast<const char*>(&net.field1), sizeof(net.field1) );
+
+		return os;
+	}
+
+	std::istream& operator>> ( std::istream& is, Network& )
+	{
+		return is;
+	}
+
 
 	/**
 	 * Feed-Forward algorithm
@@ -160,7 +223,11 @@ namespace machine {
 	// call the training method of the trainer class
 	void Network::train ( std::vector<double> input, std::vector<double> expected )
 	{
-		this->trainer->train( input, expected );
+		// when the network is in 'training mode' the input to each neuron will be stored
+		if ( !this->training )
+			this->toggleTrainingMode();
+
+		(*this->trainf)( input, expected, *this );
 	}
 
 	// return the activation function
@@ -212,6 +279,45 @@ namespace machine {
 		return this->layers.rend();
 	}
 
+	/**
+	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 * 					Iterator
+	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 */
+
+	Network::iterator::iterator( Network::iterator::pointer ptr )  : ptr_(ptr) {}
+	Network::iterator::~iterator(){}	
+
+	Network::iterator::self_type Network::iterator::operator++() 
+	{
+		self_type i = *this; ptr_++; return i;
+	}
+
+	Network::iterator::self_type Network::iterator::operator++( int i )
+	{
+		ptr_++; return *this;
+	}
+
+	Network::iterator::reference Network::iterator::operator*()
+	{
+		return *ptr_;
+	}
+
+	Network::iterator::pointer Network::iterator::operator->()
+	{
+		return ptr_;
+	}
+
+	bool Network::iterator::operator==(const Network::iterator::self_type& rhs)
+	{
+		return ptr_ == rhs.ptr_;
+	}
+
+	bool Network::iterator::operator!=(const Network::iterator::self_type& rhs)
+	{
+		return ptr_ != rhs.ptr_;
+	}
+
 
 	/**
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -219,12 +325,12 @@ namespace machine {
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 */
 	Network::Layer::Layer ( int nNeurons, int nWeights, Network &parent, int index ) 
-		: nNeurons(nNeurons), nWeights(nWeights), parent(parent), index(index)
+		: index(index), parent(parent), nNeurons(nNeurons), nWeights(nWeights)
 	{
-		this->neurons = std::vector<Layer::Neuron *>(nNeurons);
+		this->neurons = std::vector<Layer::Neuron *>(this->nNeurons);
 
 		for (auto it = neurons.begin(); it != neurons.end(); ++it)
-			(*it) = new Layer::Neuron( nWeights, parent );
+			(*it) = new Layer::Neuron( this->nWeights, parent );
 	}
 
 	Network::Layer::~Layer(){}
@@ -282,18 +388,28 @@ namespace machine {
 		return this->neurons.end();
 	}
 
+	std::ostream& operator<<( std::ostream& os, const Network::Layer& layer )
+	{
+		return os;
+	}
+
+	std::istream& operator>>( std::istream& is, Network::Layer& layer )
+	{
+		return is;
+	}
+
 	/**
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 * 					Neuron
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 */
 	Network::Layer::Neuron::Neuron ( int nWeights, Network &parent ) 
-		: nWeights(nWeights), parent(parent)
+		: parent(parent), nWeights(nWeights)
 	{
-		this->weights = std::vector<double>(nWeights);
+		this->weights = std::vector<double>(this->nWeights);
 
 		for (auto it = this->weights.begin(); it != this->weights.end(); ++it)
-			(*it) = parent.init();
+			(*it) = this->parent.init();
 	}
 
 	Network::Layer::Neuron::~Neuron(){}
@@ -306,25 +422,6 @@ namespace machine {
 	std::vector<double>::iterator Network::Layer::Neuron::end()
 	{
 		return this->weights.end();
-	}
-
-	/**
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * 					Trainer
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 */
-	Network::Trainer::Trainer ( Network& net, train_handle trainf ) : network(net), trainf(trainf) {} 
-
-	Network::Trainer::~Trainer(){}
-
-	// call the training function
-	void Network::Trainer::train ( std::vector<double> input, std::vector<double> expected )
-	{
-		// when the network is in 'training mode' the input to each neuron will be stored
-		if ( !this->network.training )
-			this->network.toggleTrainingMode();
-
-		(*this->trainf)( input, expected, this->network );
 	}
 
 }

@@ -1,7 +1,7 @@
 cxx = g++
-cxxflags = -std=c++11
+cxxflags = -std=c++11 -Wall
 src = machine.cpp
-deps = network-classes.cpp network-functions.cpp
+deps = network-obj.cpp network-fun.cpp
 # target = machine
 
 all: machine

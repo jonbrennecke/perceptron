@@ -1,0 +1,8 @@
+argv = ['../waf/waf', 'configure']
+environ = {'TERM_SESSION_ID': '1B024901-99C8-4797-8A5A-DDD702DDDFA1', 'SSH_AUTH_SOCK': '/tmp/launch-nHQflg/Listeners', 'VERSIONER_PYTHON_PREFER_32_BIT': 'no', 'TERM_PROGRAM_VERSION': '326', 'SHELL': '/bin/bash', 'LOGNAME': 'jon', 'USER': 'jon', 'HOME': '/Users/jon', 'PATH': '/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/X11/bin:/usr/local/git/bin', 'DISPLAY': '/tmp/launch-1iL1XI/org.macosforge.xquartz:0', 'TMPDIR': '/var/folders/t6/qkhfgz8x3l9dn2801mrjqb5w0000gn/T/', 'TERM_PROGRAM': 'Apple_Terminal', 'LANG': 'en_US.UTF-8', 'TERM': 'xterm-256color', 'Apple_PubSub_Socket_Render': '/tmp/launch-ArzNAF/Render', 'VERSIONER_PYTHON_VERSION': '2.7', 'SHLVL': '1', 'OLDPWD': '/Users/jon/Desktop/github/the_machine', '__CF_USER_TEXT_ENCODING': '0x1F5:0:0', 'PWD': '/Users/jon/Desktop/github/the_machine/+machine', '_': '/usr/bin/python', '__CHECKFIX1436934': '1'}
+files = ['/Users/jon/Desktop/github/the_machine/+machine/wscript']
+hash = -8046004785627014153
+options = {'files': '', 'jobs': 4, 'verbose': 0, 'nocache': False, 'progress_bar': 0, 'top': '', 'destdir': '', 'keep': 0, 'zones': '', 'prefix': '/usr/local/', 'download': False, 'force': False, 'check_cxx_compiler': 'g++', 'targets': '', 'out': ''}
+out_dir = '/Users/jon/Desktop/github/the_machine/+machine/build'
+run_dir = '/Users/jon/Desktop/github/the_machine/+machine'
+top_dir = '/Users/jon/Desktop/github/the_machine/+machine'
