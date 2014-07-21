@@ -35,12 +35,7 @@ int main (void)
 
 	auto net = machine::Network( params );
 
-	// net.save( "testsave.bin" );
-
-	for (auto it = net.begin(); it != net.end(); ++it)
-	{
-		std::cout << (*it)->size() << std::endl;
-	}
+	net.save( "testsave.bin" );
 
 	// std::vector<double> input = { 1.0, 2.0, 3.0, 4.0 };
 	// std::vector<double> expected = { 1.0, 2.0 };

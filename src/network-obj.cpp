@@ -179,10 +179,10 @@ namespace machine {
 	std::ostream& operator<< ( std::ostream& os, const Network& net )
 	{
 		// serialize the layers and the parameters
-		// for (auto layer = net.begin(); layer != net.end(); ++layer)
-		// {
-		// 	os << (*layer);
-		// }
+		for (auto layer = net.begin(); layer != net.end(); ++layer)
+		{
+			os << (*layer);
+		}
 		// out.write( reinterpret_cast<const char*>(&net.field1), sizeof(net.field1) );
 
 		return os;
@@ -259,14 +259,14 @@ namespace machine {
 	// which are really just calling the iterator methods of the layer vector
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	std::vector<Network::Layer*>::iterator Network::begin()
+	Network::iterator Network::begin()
 	{
-		return this->layers.begin();
+		return Network::iterator( this->layers.begin() );
 	}
 
-	std::vector<Network::Layer*>::iterator Network::end()
+	Network::iterator Network::end()
 	{
-		return this->layers.end();
+		return Network::iterator( this->layers.end() );
 	}
 
 	std::vector<Network::Layer*>::reverse_iterator Network::rbegin()
@@ -281,41 +281,41 @@ namespace machine {
 
 	/**
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * 					Iterator
+	 * 					Network::iterator
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 */
 
-	Network::iterator::iterator( Network::iterator::pointer ptr )  : ptr_(ptr) {}
+	Network::iterator::iterator( std::vector<pointer>::iterator it ) : it_(it) {}
 	Network::iterator::~iterator(){}	
 
 	Network::iterator::self_type Network::iterator::operator++() 
 	{
-		self_type i = *this; ptr_++; return i;
+		self_type i = *this; it_++; return i;
 	}
 
 	Network::iterator::self_type Network::iterator::operator++( int i )
 	{
-		ptr_++; return *this;
+		it_++; return *this;
 	}
 
 	Network::iterator::reference Network::iterator::operator*()
 	{
-		return *ptr_;
+		return *(*it_);
 	}
 
 	Network::iterator::pointer Network::iterator::operator->()
 	{
-		return ptr_;
+		return *it_;
 	}
 
 	bool Network::iterator::operator==(const Network::iterator::self_type& rhs)
 	{
-		return ptr_ == rhs.ptr_;
+		return it_ == rhs.it_;
 	}
 
 	bool Network::iterator::operator!=(const Network::iterator::self_type& rhs)
 	{
-		return ptr_ != rhs.ptr_;
+		return it_ != rhs.it_;
 	}
 
 

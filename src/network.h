@@ -22,8 +22,6 @@
 
 #include "machine.h"
 
-// #include "stateinfo.h"
-
 namespace machine {
 
 	// forward declare our classes
@@ -274,14 +272,16 @@ namespace machine {
 		 * 					Layer Iterator
 		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		 *
-		 * provides an STL-like iterater over the Layers, except that we don't need templates here since 
+		 * provides an STL-like iterater over the Layers, except that we don't need templates here since we know 
+		 * exactly what we're iterating over.
 		 *
 		 * see
 		 *		http://stackoverflow.com/questions/8054273/how-to-implement-an-stl-style-iterator-and-avoid-common-pitfalls/8054856#8054856
-		 *		http://www.dreamincode.net/forums/topic/58468-making-your-own-iterators/
+		 *		https://gist.github.com/jeetsukumaran/307264#file-custom_iterator-cpp-L50
 		 */
-		struct iterator
+		class iterator
 		{
+		public:
 			typedef iterator self_type;
 			typedef Layer value_type;
 			typedef Layer& reference;
@@ -289,7 +289,7 @@ namespace machine {
 			typedef std::forward_iterator_tag iterator_category;
 			typedef int difference_type;
 
-			iterator( pointer );
+			iterator( std::vector<pointer>::iterator );
 			~iterator();
 			
 			self_type operator++(); 
@@ -300,8 +300,35 @@ namespace machine {
 			bool operator!=(const self_type& rhs);
 
 		private:
-			pointer ptr_;
+			std::vector<pointer>::iterator it_;
 		};
+
+		// class iterator : public std::vector<Layer*>::iterator
+		// {
+		// public:
+		// 	iterator( std::vector<Layer*>::iterator );
+		// 	~iterator();
+			
+		// };
+
+		// struct const_iterator
+  //       {
+//               typedef const_iterator self_type;
+//               typedef T value_type;
+//               typedef T& reference;
+//               typedef T* pointer;
+//               typedef int difference_type;
+//               typedef std::forward_iterator_tag iterator_category;
+//               const_iterator(pointer ptr) : ptr_(ptr) { }
+//               self_type operator++() { self_type i = *this; ptr_++; return i; }
+//               self_type operator++(int junk) { ptr_++; return *this; }
+//               const reference operator*() { return *ptr_; }
+//               const pointer operator->() { return ptr_; }
+//               bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+//               bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+//           private:
+//               pointer ptr_;
+//       };
 
 		Network ( const Parameters& );
 		Network ( std::string, const Parameters& );
@@ -323,8 +350,8 @@ namespace machine {
 		friend std::istream& operator>>( std::istream&, Network& );
 
 		// iterator methods
-		std::vector<Layer*>::iterator begin();
-		std::vector<Layer*>::iterator end();
+		iterator begin();
+		iterator end();
 		std::vector<Layer*>::reverse_iterator rbegin();
 		std::vector<Layer*>::reverse_iterator rend();
 
