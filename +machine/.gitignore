@@ -1,1 +1,3 @@
-waf/.waf*
+.waf*
+.lock*
+octave-workspace
