@@ -30,9 +30,9 @@ classdef Network
 		% 
 		function this = Network( params )
 
-			if ( exist('param','var') && isstruct(params) )
+			if ( exist('params','var') && isstruct(params) )
 				% this.handle = 
-				% constructor
+				machine.constructor(params);
 			end
 
 		end

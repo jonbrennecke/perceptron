@@ -151,7 +151,7 @@ namespace machine {
 	 *		- http://www.faqs.org/faqs/ai-faq/neural-nets/part1/preamble.html
 	 *
 	 */
-	class Network : public Serializable
+	class Network
 	{
 	public:
 
@@ -165,7 +165,7 @@ namespace machine {
 		class Layer
 		{
 		public:
-			
+
 			/**
 			 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			 *					Neuron
@@ -192,6 +192,41 @@ namespace machine {
 			};
 
 			/**
+			 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			 * 					Neuron Iterator
+			 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			 *
+			 * provides an STL-like iterater over the Neurons in a Layer
+			 *
+			 * see
+			 *		http://stackoverflow.com/questions/8054273/how-to-implement-an-stl-style-iterator-and-avoid-common-pitfalls/8054856#8054856
+			 *		https://gist.github.com/jeetsukumaran/307264#file-custom_iterator-cpp-L50
+			 */
+			class iterator
+			{
+			public:
+				typedef iterator self_type;
+				typedef Neuron value_type;
+				typedef Neuron& reference;
+				typedef Neuron* pointer;
+				typedef std::forward_iterator_tag iterator_category;
+				typedef int difference_type;
+
+				iterator( std::vector<pointer>::iterator );
+				~iterator();
+				
+				self_type operator++(); 
+				self_type operator++( int i );
+				reference operator*();
+				pointer operator->();
+				bool operator==(const self_type& rhs);
+				bool operator!=(const self_type& rhs);
+
+			private:
+				std::vector<pointer>::iterator it_;
+			};
+
+			/**
 			 * :param nNeurons - dimension of the layer; eg. number of 'neurons'
 			 * :param nWeights - length of the layer; eg. dimension of the weight vector of each of n 'neurons'
 			 */
@@ -200,9 +235,9 @@ namespace machine {
 			std::vector<double> getInput();
 			std::vector<double> getOutput();
 			std::vector<double> feedForward( std::vector<double> );
-			std::vector<Neuron*>::iterator begin();
-			std::vector<Neuron*>::iterator end();
-			int size();
+			Layer::iterator begin();
+			Layer::iterator end();
+			int size() const;
 			int index;
 
 			// stream operators for serializing the layer
@@ -269,19 +304,18 @@ namespace machine {
 
 		/**
 		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		 * 					Layer Iterator
+		 * 					Layer Iterators
 		 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		 *
-		 * provides an STL-like iterater over the Layers, except that we don't need templates here since we know 
+		 * provides a few STL-like iteraters over the Layers, except that we don't need templates here since we know 
 		 * exactly what we're iterating over.
 		 *
 		 * see
 		 *		http://stackoverflow.com/questions/8054273/how-to-implement-an-stl-style-iterator-and-avoid-common-pitfalls/8054856#8054856
 		 *		https://gist.github.com/jeetsukumaran/307264#file-custom_iterator-cpp-L50
 		 */
-		class iterator
+		struct iterator
 		{
-		public:
 			typedef iterator self_type;
 			typedef Layer value_type;
 			typedef Layer& reference;
@@ -303,32 +337,24 @@ namespace machine {
 			std::vector<pointer>::iterator it_;
 		};
 
-		// class iterator : public std::vector<Layer*>::iterator
-		// {
-		// public:
-		// 	iterator( std::vector<Layer*>::iterator );
-		// 	~iterator();
-			
-		// };
-
 		// struct const_iterator
   //       {
-//               typedef const_iterator self_type;
-//               typedef T value_type;
-//               typedef T& reference;
-//               typedef T* pointer;
-//               typedef int difference_type;
-//               typedef std::forward_iterator_tag iterator_category;
-//               const_iterator(pointer ptr) : ptr_(ptr) { }
-//               self_type operator++() { self_type i = *this; ptr_++; return i; }
-//               self_type operator++(int junk) { ptr_++; return *this; }
-//               const reference operator*() { return *ptr_; }
-//               const pointer operator->() { return ptr_; }
-//               bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
-//               bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
-//           private:
-//               pointer ptr_;
-//       };
+		// 	typedef const_iterator self_type;
+		// 	typedef T value_type;
+		// 	typedef T& reference;
+		// 	typedef T* pointer;
+		// 	typedef int difference_type;
+		// 	typedef std::forward_iterator_tag iterator_category;
+		// 	const_iterator(pointer ptr) : ptr_(ptr) { }
+		// 	self_type operator++() { self_type i = *this; ptr_++; return i; }
+		// 	self_type operator++(int junk) { ptr_++; return *this; }
+		// 	const reference operator*() { return *ptr_; }
+		// 	const pointer operator->() { return ptr_; }
+		// 	bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+		// 	bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+		// private:
+		// 	pointer ptr_;
+		// };
 
 		Network ( const Parameters& );
 		Network ( std::string, const Parameters& );
@@ -340,7 +366,7 @@ namespace machine {
 		void train ( std::vector<double>, std::vector<double> );
 		void toggleTrainingMode();
 		double init ();
-		int size ();
+		int size () const;
 		double rate ();
 		void save ( std::string );
 		void load ( std::string );

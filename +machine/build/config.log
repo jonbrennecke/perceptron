@@ -1,5 +1,5 @@
-# project  configured on Sat Jul 19 17:10:42 2014 by
-# waf 1.6.11 (abi 98, python 20705f0 on darwin)
+# project  configured on Mon Jul 21 13:01:48 2014 by
+# waf 1.8.0 (abi 98, python 20705f0 on darwin)
 # using ../waf/waf configure
 #
 ----------------------------------------
@@ -9,23 +9,24 @@ Setting top to
 Setting out to
 /Users/jon/Desktop/github/the_machine/+machine/build
 ----------------------------------------
-Checking for 'g++' (c++ compiler)
-find program=['g++', 'c++'] paths=['/opt/local/bin', '/opt/local/sbin', '/usr/local/bin', '/usr/bin', '/bin', '/usr/sbin', '/sbin', '/usr/local/bin', '/opt/X11/bin', '/usr/local/git/bin'] var='CXX' -> '/usr/bin/g++'
-find program=['ar'] paths=['/opt/local/bin', '/opt/local/sbin', '/usr/local/bin', '/usr/bin', '/bin', '/usr/sbin', '/sbin', '/usr/local/bin', '/opt/X11/bin', '/usr/local/git/bin'] var='AR' -> '/usr/bin/ar'
-/usr/bin/g++
+Checking for 'clang++' (C++ compiler)
+find program=['clang++'] paths=['/opt/local/bin', '/opt/local/sbin', '/usr/local/bin', '/usr/bin', '/bin', '/usr/sbin', '/sbin', '/usr/local/bin', '/opt/X11/bin', '/usr/local/git/bin'] var='CXX' -> ['/usr/bin/clang++']
+find program=['ar'] paths=['/opt/local/bin', '/opt/local/sbin', '/usr/local/bin', '/usr/bin', '/bin', '/usr/sbin', '/sbin', '/usr/local/bin', '/opt/X11/bin', '/usr/local/git/bin'] var='AR' -> ['/usr/bin/ar']
+/usr/bin/clang++
 ----------------------------------------
 Checking for compiler flags -O2
 ==>
 
-int main() {
+int main(int argc, char **argv) {
+	(void)argc; (void)argv;
 	return 0;
 }
 
 <==
-[1/2] [32mcxx: build/.conf_check_312af5292f06006c7449e66ea228a715/test.cpp -> build/.conf_check_312af5292f06006c7449e66ea228a715/testbuild/test.cpp.1.o
+[1/2] [32mcxx: build/.conf_check_6a78d2f48a7e48190540460eeb37aedd/test.cpp -> build/.conf_check_6a78d2f48a7e48190540460eeb37aedd/testbuild/test.cpp.1.o
 [0m
-['/usr/bin/g++', '-O2', '-I/usr/local/Cellar/octave/3.8.0/include/octave-3.8.0/octave', '../test.cpp', '-c', '-o', 'test.cpp.1.o']
-[2/2] [33mcxxprogram: build/.conf_check_312af5292f06006c7449e66ea228a715/testbuild/test.cpp.1.o -> build/.conf_check_312af5292f06006c7449e66ea228a715/testbuild/testprog
+['/usr/bin/clang++', '-O2', '-I/Applications/MATLAB_R2013a.app/extern/include', '../test.cpp', '-c', '-o', '/Users/jon/Desktop/github/the_machine/+machine/build/.conf_check_6a78d2f48a7e48190540460eeb37aedd/testbuild/test.cpp.1.o']
+[2/2] [33mcxxprogram: build/.conf_check_6a78d2f48a7e48190540460eeb37aedd/testbuild/test.cpp.1.o -> build/.conf_check_6a78d2f48a7e48190540460eeb37aedd/testbuild/testprog
 [0m
-['/usr/bin/g++', 'test.cpp.1.o', '-o', '/Users/jon/Desktop/github/the_machine/+machine/build/.conf_check_312af5292f06006c7449e66ea228a715/testbuild/testprog', '-L/usr/local/Cellar/octave/3.8.0/lib/octave/3.8.0', '-L/usr/local/Cellar/octave/3.8.0/lib/octave/3.8.0/oct/x86_64-apple-darwin13.1.0/']
+['/usr/bin/clang++', 'test.cpp.1.o', '-o', '/Users/jon/Desktop/github/the_machine/+machine/build/.conf_check_6a78d2f48a7e48190540460eeb37aedd/testbuild/testprog', '-L/Applications/MATLAB_R2013a.app/extern/lib/maci64/']
 yes

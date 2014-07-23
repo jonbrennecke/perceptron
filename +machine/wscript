@@ -1,23 +1,34 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
+# ---- matlab
+matlab_dir = "/Applications/MATLAB_R2013a.app/"
+
+# ---- octave
+octave_ver = '3.8.0'
+octave_dir = "/usr/local/Cellar/octave/" + octave_ver
+
 def options(opt):
 	opt.load("compiler_cxx")
 
 def configure(conf):
 	conf.load("compiler_cxx")
 
-	octave_ver = '3.8.0'
-	octave_dir = "/usr/local/Cellar/octave/" + octave_ver
+	# conf.env.LIBPATH_OCT = [
+	# 	octave_dir+'/lib/octave/'+octave_ver, 
+	# 	octave_dir+'/lib/octave/'+octave_ver+'/oct/x86_64-apple-darwin13.1.0/'
+	# ]
 
-	conf.env.LIBPATH_MEX = [
-		octave_dir+'/lib/octave/'+octave_ver, 
-		octave_dir+'/lib/octave/'+octave_ver+'/oct/x86_64-apple-darwin13.1.0/'
-	]
+	# conf.env.INCLUDES_OCT = [ octave_dir+'/include/octave-'+octave_ver+'/octave/' ]
 
-	conf.env.INCLUDES_MEX = [ octave_dir+'/include/octave-'+octave_ver+'/octave/' ]
+
+	conf.env.LIBPATH_MEX = [ matlab_dir+'extern/lib/maci64/' ]
+
+	conf.env.INCLUDES_MEX = [ matlab_dir+'extern/include/' ]
 
 	conf.check_cxx( use='MEX', cxxflags='-O2')
+
+	conf.env.append_value('INCLUDES', [ matlab_dir+'extern/include/' ])
 
 def build(bld):
 
@@ -26,13 +37,29 @@ def build(bld):
 	# 	'destructor'
 	# ]
 
+	bld.env.append_value('MEX', matlab_dir+'extern/include/')
 	# for
 
+	# ---- octave
+	# bld.objects(
+	# 	features='cxx cxxprogram',
+	# 	source='../src/network-fun.cpp ../src/network-obj.cpp constructor.cpp',
+	# 	target='constructor.mex',
+	# 	cxxflags=['-std=c++11','-O2','-Wall'],
+	# 	use=['MEX'],
+	# 	includes=[ 'mex','octave','coctinterp' ]
+	# 	);
+
+	# -lmex -lmx -lmwlapack -lmwblas -leng
+
+	# ---- matlab
 	bld.objects(
 		features='cxx cxxprogram',
 		source='../src/network-fun.cpp ../src/network-obj.cpp constructor.cpp',
 		target='constructor.mex',
-		cxxflags=['-std=c++11','-O2','-Wall'],
+		# includes=matlab_dir+'extern/include/',
+		cxxflags=['-std=c++11','-O2','-Wall','-I'+matlab_dir+'extern/include/'],
 		use=['MEX'],
-		includes=[ 'mex','octave','coctinterp' ]
+		lib=[ 'mex','mx', 'mwlapack', 'mwblas', 'eng' ],
+		# includes=[ 'mex','mx', 'mwlapack', 'mwblas', 'eng' ]
 		);

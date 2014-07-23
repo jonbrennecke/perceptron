@@ -1,2 +1,2 @@
-version = 0x1060b00
-tools = [{'tool': 'ar', 'tooldir': None, 'funs': None}, {'tool': 'cxx', 'tooldir': None, 'funs': None}, {'tool': 'g++', 'tooldir': None, 'funs': None}, {'tool': 'compiler_cxx', 'tooldir': None, 'funs': None}]
+version = 0x1080000
+tools = [{'tool': 'ar', 'tooldir': None, 'funs': None}, {'tool': 'cxx', 'tooldir': None, 'funs': None}, {'tool': 'clang++', 'tooldir': None, 'funs': None}, {'tool': 'compiler_cxx', 'tooldir': None, 'funs': None}]

@@ -123,7 +123,7 @@ namespace machine {
 				// expected answer
 				auto ex = expected.begin();
 				auto in = layer_input.begin();
-				for (auto weight = (*neuron)->begin(); weight != (*neuron)->end(); ++weight, ++in, ++ex )
+				for (auto weight = (*neuron).begin(); weight != (*neuron).end(); ++weight, ++in, ++ex )
 				{
 					// calculate the deltas of the weights
 					double delta = rate * ((*ex) - (*in)) * actf.dydx((*out)) * (*in);

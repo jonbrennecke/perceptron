@@ -1,9 +1,10 @@
-#include <string>
+#ifndef NETWORK_MEX_H
+#define NETWORK_MEX_H
+
 #include "../src/network.h"
-// #include "network-mex.h"
 #include "mex.h"
 #include "mexutils.h"
-
+#include <string>
 
 /**
  * Convert a string to an integer
@@ -19,6 +20,8 @@ static constexpr unsigned int str2int(const char* str, int h = 0)
 	return !str[h] ? 5381 : (str2int(str, h+1)*33) ^ str[h];
 }
 
+namespace machine {
+
 /**
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,7 +31,7 @@ static constexpr unsigned int str2int(const char* str, int h = 0)
  * Construct a Network parameters object from a mex structure array
  *
  */
-class MexParameters : public machine::Network::Parameters
+class MexParameters : public Network::Parameters
 {
 public:
 	MexParameters( const mxArray* params )
@@ -88,22 +91,7 @@ public:
 	
 };
 
-
-void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{
-    // check outputs TODO uncomment
-	if (nlhs != 1)
-		mexErrMsgTxt("One output expected.");
-
-	// if parameters are passed, build a network with those parameters
-	// otherwise, build a network with the default parameters
-	// if ( nrhs > 0 ) 
-	auto params = MexParameters( prhs[0] );
-	// else 
-		// auto params = machine::Network::Parameters();
-
-	auto net = new machine::Network(params);
-
-	// mxArray* test = (mxArray*)mex::Handle(net);
-	auto h = mex::Handle<machine::Network>(net);
 }
+
+#endif
+

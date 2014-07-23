@@ -179,10 +179,10 @@ namespace machine {
 	std::ostream& operator<< ( std::ostream& os, const Network& net )
 	{
 		// serialize the layers and the parameters
-		for (auto layer = net.begin(); layer != net.end(); ++layer)
-		{
-			os << (*layer);
-		}
+		// for (auto layer = net.begin(); layer != net.end(); ++layer)
+		// {
+		// 	os << (*layer);
+		// }
 		// out.write( reinterpret_cast<const char*>(&net.field1), sizeof(net.field1) );
 
 		return os;
@@ -237,7 +237,7 @@ namespace machine {
 	}
 
 	// return the number of layers in the network
-	int Network::size ()
+	int Network::size () const
 	{
 		return this->layers.size();
 	}
@@ -373,29 +373,72 @@ namespace machine {
 	}
 
 	// get the size of the layer
-	int Network::Layer::size()
+	int Network::Layer::size() const
 	{
 		return this->neurons.size();
 	}
 
-	std::vector<Network::Layer::Neuron*>::iterator Network::Layer::begin()
+	Network::Layer::iterator Network::Layer::begin()
 	{
-		return this->neurons.begin();
+		return Network::Layer::iterator( this->neurons.begin() );
 	}
 
-	std::vector<Network::Layer::Neuron*>::iterator Network::Layer::end()
+	Network::Layer::iterator Network::Layer::end()
 	{
-		return this->neurons.end();
+		return Network::Layer::iterator( this->neurons.end() );
 	}
 
 	std::ostream& operator<<( std::ostream& os, const Network::Layer& layer )
 	{
+		// serialize the neurons
+		// for (auto neuron = layer.begin(); neuron != layer.end(); ++neuron)
+		// 	os << (*neuron);
+
 		return os;
 	}
 
 	std::istream& operator>>( std::istream& is, Network::Layer& layer )
 	{
 		return is;
+	}
+
+	/**
+	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 * 					Network::iterator
+	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 */
+
+	Network::Layer::iterator::iterator( std::vector<pointer>::iterator it ) : it_(it) {}
+	Network::Layer::iterator::~iterator(){}	
+
+	Network::Layer::iterator::self_type Network::Layer::iterator::operator++() 
+	{
+		self_type i = *this; it_++; return i;
+	}
+
+	Network::Layer::iterator::self_type Network::Layer::iterator::operator++( int i )
+	{
+		it_++; return *this;
+	}
+
+	Network::Layer::iterator::reference Network::Layer::iterator::operator*()
+	{
+		return *(*it_);
+	}
+
+	Network::Layer::iterator::pointer Network::Layer::iterator::operator->()
+	{
+		return *it_;
+	}
+
+	bool Network::Layer::iterator::operator==(const Network::Layer::iterator::self_type& rhs)
+	{
+		return it_ == rhs.it_;
+	}
+
+	bool Network::Layer::iterator::operator!=(const Network::Layer::iterator::self_type& rhs)
+	{
+		return it_ != rhs.it_;
 	}
 
 	/**
