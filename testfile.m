@@ -11,6 +11,8 @@ params = struct( ...
 
 net = machine.Network( params );
 
+net.feedForward([1 2 3 4]);
+
 
 
 

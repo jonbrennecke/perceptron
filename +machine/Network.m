@@ -43,7 +43,7 @@ classdef Network
 		function train ()
 		end
 
-		function feedForward ( inputV )
+		function feedForward ( this, inputV )
 
 			machine.feedForward( this.handle, inputV );
 

@@ -182,3 +182,4 @@ void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	plhs[0] = (mxArray*)mex::Handle<machine::Network>(net);
 }
+

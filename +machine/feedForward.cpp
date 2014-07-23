@@ -38,6 +38,7 @@ void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if ( nrhs > 0 ) 
 	{
 		auto handle = mex::Handle<machine::Network>(prhs[0]);
-		auto net = (machine::Network*)handle;
+		// auto net = (machine::Network*)handle;
 	}
+	
 }

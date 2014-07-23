@@ -113,6 +113,8 @@ namespace mex {
 		// constructor from mxArray*
 		Handle( mxArray* mxptr ) : mxptr_(mxptr) {}
 
+		Handle( const mxArray* mxptr ) : mxptr_(mxptr) {}
+
 		~Handle()
 		{
 			// invoke the destructor of the C++ class
@@ -123,6 +125,10 @@ namespace mex {
 		// conversion operators
 
 		inline operator mxArray*() { return mxptr_; }
+
+		// inline explicit operator const mxArray*() { return mxptr_; }
+
+		// inline operator mxArray*() { return mxptr_; }
 
 		inline operator Base<T>*() 
 		{
