@@ -20,7 +20,7 @@
 classdef Network
 
 	properties (Hidden)
-		handle;
+		handle; % handle to the c++ instance
 	end
 
 	properties (SetAccess = private)

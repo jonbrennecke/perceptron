@@ -17,7 +17,17 @@
 #include "mex.h"
 #include "mexutils.h"
 
-
+/**
+ * in Matlab, this function takes as parameters:
+ * 		:param params - a pointer to the C++ Network class
+ *
+ * in C++, this function takes as parameters:
+ * 		:param nlhs - Number of output (left-side) arguments (the size of the plhs array)
+ * 		:param plhs - Array of output arguments.
+ * 		:param nrhs - Number of input (right-side) arguments (or the size of the prhs array)
+ * 		:param prhs - Array of input arguments.
+ *
+ */
 void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     // check outputs

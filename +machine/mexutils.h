@@ -25,29 +25,6 @@
 namespace mex {
 
 	/**
-	*
-	* the original mxArrayToString contains a bug documented here:
-	* http://www.mathworks.com/matlabcentral/answers/59483-is-there-a-maximum-input-size-for-mex-segmentation-fault-with-large-inputs
-	*
-	*/
-	char *mxArrayToString(mxArray *mx)
-	{
-		 char *cp = NULL;
-		 short *sp; // Assumes a short is 2-bytes
-		 mwSize i, n;
-		 if( mx && mxIsChar(mx) ) {
-			 n = mxGetNumberOfElements(mx);
-			 sp = (short *) mxGetData(mx);
-			 cp = (char *) mxMalloc(n+1);
-			 for( i=0; i<n; i++ ) {
-				 cp[i] = sp[i];
-			 }
-			 cp[n] = '\0';
-		 }
-		 return cp;
-	}
-
-	/**
 	 *
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 * 				Marshal
@@ -113,6 +90,9 @@ namespace mex {
 	 * 				Handle
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 * Persistent handle to a C++ class instance 
+	 *
+	 * "Handle" lets us convert back and forth between pointers to C++ data types 
+	 * and mxArray's that we can pass back to matlab.
 	 *
 	 */
 	template<class T> class Handle

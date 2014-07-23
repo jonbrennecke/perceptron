@@ -33,7 +33,6 @@ static constexpr unsigned int str2int(const char* str, int h = 0)
 }
 
 /**
- *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 			 						Mex Parameters
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -158,6 +157,18 @@ public:
 	~MexParameters(){}
 };
 
+
+/**
+ * in Matlab, this function takes as parameters:
+ *		:param params - a matlab struct of parameters to the Network
+ *
+ * in C++, this function takes as parameters:
+ * 		:param nlhs - Number of output (left-side) arguments (the size of the plhs array)
+ * 		:param plhs - Array of output arguments.
+ * 		:param nrhs - Number of input (right-side) arguments (or the size of the prhs array)
+ * 		:param prhs - Array of input arguments.
+ *
+ */
 void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     // check outputs
