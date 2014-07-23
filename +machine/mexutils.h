@@ -37,7 +37,7 @@ namespace mex {
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 * 				Base
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * Base to a C++ class
+	 * Base class signature
 	 *
 	 */
 	template<class T> class Base
@@ -96,6 +96,7 @@ namespace mex {
 
 		~Handle()
 		{
+			// invoke the destructor of the C++ class
 			delete (T*)(*this);
 			mexUnlock();
 		}

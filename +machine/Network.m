@@ -26,13 +26,12 @@ classdef Network
 
 		% Constructor
 		% 
-		% :param params - 
+		% :param params - struct of options
 		% 
 		function this = Network( params )
 
 			if ( exist('params','var') && isstruct(params) )
-				% this.handle = 
-				machine.constructor(params);
+				this.handle = machine.constructor(params);
 			end
 
 		end

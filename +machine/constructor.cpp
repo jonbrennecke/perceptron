@@ -1,6 +1,5 @@
 #include <string>
 #include "../src/network.h"
-// #include "network-mex.h"
 #include "mex.h"
 #include "mexutils.h"
 
@@ -85,7 +84,6 @@ public:
 	}
 
 	~MexParameters(){}
-	
 };
 
 
@@ -97,13 +95,9 @@ void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	// if parameters are passed, build a network with those parameters
 	// otherwise, build a network with the default parameters
-	// if ( nrhs > 0 ) 
 	auto params = MexParameters( prhs[0] );
-	// else 
-		// auto params = machine::Network::Parameters();
 
 	auto net = new machine::Network(params);
 
-	// mxArray* test = (mxArray*)mex::Handle(net);
-	auto h = mex::Handle<machine::Network>(net);
+	plhs[0] = (mxArray*)mex::Handle<machine::Network>(net);
 }
