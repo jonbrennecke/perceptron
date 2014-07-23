@@ -1,9 +1,25 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *   _   _                                  _     _            
+ *  | |_| |__   ___    _ __ ___   __ _  ___| |__ (_)_ __   ___ 
+ *  | __| '_ \ / _ \  | '_ ` _ \ / _` |/ __| '_ \| | '_ \ / _ \
+ *  | |_| | | |  __/  | | | | | | (_| | (__| | | | | | | |  __/
+ *   \__|_| |_|\___|  |_| |_| |_|\__,_|\___|_| |_|_|_| |_|\___|
+ *                                                          
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * A machine learning experiment by @jonbrennecke / https://github.com/jonbrennecke
+ *
+ * Released under the MIT license (see the accompanying LICENSE.md)
+ */  
+
+
 #ifndef MEXUTILS_H
 #define MEXUTILS_H
 
 #include "mex.h"
 #include <typeinfo>
 
+// this is just an arbitrary hash that we'll use this to verify out classes
 #define CLASS_HANDLE_SIGNATURE 0xFF00F0A5
 
 namespace mex {
@@ -139,8 +155,6 @@ namespace mex {
 		}
 
 		inline operator T*() { return ((Base<T>*)(*this))->ptr(); }
-
-
 		
 	};
 

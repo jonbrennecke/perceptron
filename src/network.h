@@ -1,10 +1,22 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *   _   _                                  _     _            
+ *  | |_| |__   ___    _ __ ___   __ _  ___| |__ (_)_ __   ___ 
+ *  | __| '_ \ / _ \  | '_ ` _ \ / _` |/ __| '_ \| | '_ \ / _ \
+ *  | |_| | | |  __/  | | | | | | (_| | (__| | | | | | | |  __/
+ *   \__|_| |_|\___|  |_| |_| |_|\__,_|\___|_| |_|_|_| |_|\___|
+ *                                                          
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * A machine learning experiment by @jonbrennecke / https://github.com/jonbrennecke
+ *
+ * Released under the MIT license (see the accompanying LICENSE.md)
+ */  
+
+
 /**
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 							Artificial Neural Network Base Classes
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * by jonbrennecke / https://github.com/jonbrennecke
- *
  */
 
 #ifndef NETWORK_H
@@ -359,10 +371,10 @@ namespace machine {
 		~Network();
 
 		std::vector<double> feedForward ( std::vector<double> );
-		double propogate ( std::vector<double>, std::vector<double> );
-		const ActFunction& activate ();
 		void train ( std::vector<double>, std::vector<double> );
 		void toggleTrainingMode();
+		double propogate ( std::vector<double>, std::vector<double> );
+		const ActFunction& activate ();
 		double init ();
 		int size () const;
 		double rate ();
