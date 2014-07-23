@@ -41,11 +41,12 @@ public:
 			{
 				// retrieve the fieldname and value
 				const char *fieldname = mxGetFieldNameByNumber(params, i);
-				auto value = mxGetField(params, i, fieldname);
+				auto value = mxGetFieldByNumber(params, 0, i);
 
-				// Marshal lets us cast mex pointers to native C++ types
+				// Marshal mex pointers to native C++ types
 				auto m = mex::Marshal(value);
 
+				// TODO, find a better way to do this than an incredibly ugly switch statement
 				switch (str2int(fieldname))
 				{
 					case str2int("inputs") :
@@ -68,16 +69,73 @@ public:
 						break;
 					case str2int("activation") :
 					case str2int("act") :
+					{
+						if( mxIsChar(value) )
+						{
+							// find the correct activation function
+							switch ( str2int((char*)m) )
+							{
+								case str2int("sigmoid") :
+									this->activation(machine::sigmoid);
+									break;
+								case str2int("softplus") :
+									this->activation(machine::softplus);
+									break;
+								case str2int("tanh") :
+								case str2int("hyperbolic_tan") :
+									this->activation(machine::hyperbolic_tan);
+									break;
+							}
+
+						}
 						break;
+					}
 					case str2int("initialization") :
 					case str2int("init") :
+					{
+						if( mxIsChar(value) )
+						{
+							// find the correct initialization function
+							switch ( str2int((char*)m) )
+							{
+								case str2int("random") :
+									this->initialization(machine::random);
+									break;
+							}
+						}
 						break;
+					}
 					case str2int("propogation") :
 					case str2int("prop") :
+					{
+						if( mxIsChar(value) )
+						{	
+							// find the correct propogation function
+							switch ( str2int((char*)m) )
+							{
+								case str2int("dotprod") :
+								case str2int("dot") :
+									this->propogation(machine::dotprod);
+									break;
+							}
+						}
 						break;
+					}
 					case str2int("training") :
 					case str2int("train") :
+					{
+						if( mxIsChar(value) )
+						{	
+							// find the correct propogation function
+							switch ( str2int((char*)m) )
+							{
+								case str2int("backPropogation") :
+									this->training(machine::backPropogation);
+									break;
+							}
+						}
 						break;
+					}
 				}
 			}
 		}
@@ -86,17 +144,15 @@ public:
 	~MexParameters(){}
 };
 
-
 void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    // check outputs TODO uncomment
+    // check outputs
 	if (nlhs != 1)
 		mexErrMsgTxt("One output expected.");
 
 	// if parameters are passed, build a network with those parameters
 	// otherwise, build a network with the default parameters
 	auto params = MexParameters( prhs[0] );
-
 	auto net = new machine::Network(params);
 
 	plhs[0] = (mxArray*)mex::Handle<machine::Network>(net);

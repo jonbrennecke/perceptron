@@ -20,8 +20,6 @@
 #include <iterator>
 #include <fstream>
 
-#include "machine.h"
-
 namespace machine {
 
 	// forward declare our classes

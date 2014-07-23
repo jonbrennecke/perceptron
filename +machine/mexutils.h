@@ -9,6 +9,29 @@
 namespace mex {
 
 	/**
+	*
+	* the original mxArrayToString contains a bug documented here:
+	* http://www.mathworks.com/matlabcentral/answers/59483-is-there-a-maximum-input-size-for-mex-segmentation-fault-with-large-inputs
+	*
+	*/
+	char *mxArrayToString(mxArray *mx)
+	{
+		 char *cp = NULL;
+		 short *sp; // Assumes a short is 2-bytes
+		 mwSize i, n;
+		 if( mx && mxIsChar(mx) ) {
+			 n = mxGetNumberOfElements(mx);
+			 sp = (short *) mxGetData(mx);
+			 cp = (char *) mxMalloc(n+1);
+			 for( i=0; i<n; i++ ) {
+				 cp[i] = sp[i];
+			 }
+			 cp[n] = '\0';
+		 }
+		 return cp;
+	}
+
+	/**
 	 *
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 * 				Marshal
@@ -24,7 +47,7 @@ namespace mex {
 
 		inline operator std::string() { return std::string((char *)(*this)); }
 
-		inline operator char*() { return mxArrayToString(ptr_); }
+		inline explicit operator char*() { return mxArrayToString(ptr_); }
 
 		inline explicit operator double() { return mxGetScalar(ptr_); }
 

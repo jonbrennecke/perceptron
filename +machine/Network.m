@@ -12,6 +12,10 @@
 % by @jonbrennecke / https://github.com/jonbrennecke
 %
 % Released under the MIT license (see the accompanying LICENSE.md)
+% 
+% 
+% Network.m is a wrapper around the C++ Network class defined in ../src/network.h and implemented in ../src/network-obj.cpp
+% 
 %  
 classdef Network
 
@@ -35,6 +39,10 @@ classdef Network
 			end
 
 		end
+
+		% function 
+
+
 
 	end
 end
