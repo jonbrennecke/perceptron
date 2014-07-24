@@ -63,6 +63,7 @@ public:
 				switch (str2int(fieldname))
 				{
 					case str2int("inputs") :
+						mexPrintf("inputs: %d\n",(int)m);
 						this->inputs((unsigned int)m);
 						break;
 					case str2int("outputs") :
@@ -180,6 +181,10 @@ void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	auto params = MexParameters( prhs[0] );
 	auto net = new machine::Network(params);
 
-	plhs[0] = (mxArray*)mex::Handle<machine::Network>(net);
+	const mxArray* a = (const mxArray*)mex::Handle<machine::Network>(net);
+
+	// this is a hack, but so is matlab; const_cast invokes undefined behavior
+	plhs[0] = const_cast<mxArray*>(a);
+
 }
 

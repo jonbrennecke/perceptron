@@ -42,6 +42,6 @@ netlib-obj:
 netlib: netlib-obj
 	$(cxx) $(netlibflags) -o $(netlib_target).$(netlib_ext) $(addsuffix .o,$(netlib_files))
 
-$(cxxfiles): netlib
-	$(cxx) $(cxxflags) $(mexflags) $@.cpp $(netlib_target).$(netlib_ext) -o $@.$(target_ext) $(lib_path) $(inc_path) $(libs)
+$(cxxfiles): netlib-obj
+	$(cxx) $(cxxflags) $(mexflags) $@.cpp $(addsuffix .o,$(netlib_files)) -o $@.$(target_ext) $(lib_path) $(inc_path) $(libs)
 

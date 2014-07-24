@@ -44,9 +44,7 @@ classdef Network
 		end
 
 		function feedForward ( this, inputV )
-
 			machine.feedForward( this.handle, inputV );
-
 		end
 
 	end % end methods

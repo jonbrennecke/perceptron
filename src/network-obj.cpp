@@ -16,9 +16,6 @@
 #include <random>
 #include <stdexcept>
 #include <fstream>
-
- #include <iostream>
-
 #include "network.h"
 
 namespace machine {

@@ -19,7 +19,8 @@
 
 /**
  * in Matlab, this function takes as parameters:
- * 		:param params - a pointer to the C++ Network class
+ * 		:param handle - a pointer to a C++ Network class
+ *		:param inputV - input vector
  *
  * in C++, this function takes as parameters:
  * 		:param nlhs - Number of output (left-side) arguments (the size of the plhs array)
@@ -30,15 +31,17 @@
  */
 void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    // check outputs
-	// if (nlhs != 1)
-	// 	mexErrMsgTxt("One output expected.");
-
-	// cast the mxArray* back to a Network*
-	if ( nrhs > 0 ) 
+	if ( nrhs > 1 ) 
 	{
+		// cast the mxArray* back to a Network*
 		auto handle = mex::Handle<machine::Network>(prhs[0]);
-		// auto net = (machine::Network*)handle;
+		auto net = (machine::Network*)handle;
+
+		// cast the second argument into a vector
+		std::vector<double> v = mex::getVector<double>(prhs[1]);
+
+		// 
+		net->feedForward(v);
 	}
-	
+
 }

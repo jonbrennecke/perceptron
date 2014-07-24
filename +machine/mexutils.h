@@ -36,7 +36,7 @@ namespace mex {
 	{
 		Marshal ( mxArray* ptr ) : ptr_(ptr) {}
 
-		inline operator int() { return 1; }
+		inline operator int() { return round((double)(*this)); }
 
 		inline operator std::string() { return std::string((char *)(*this)); }
 
@@ -84,6 +84,21 @@ namespace mex {
 		T *ptr_m;
 	};
 
+	template<class T> std::vector<T> getVector( const mxArray* mx )
+	{
+		T* array = (T*)mxGetData(mx);
+		size_t size = mxGetNumberOfElements(mx);
+
+		std::vector<T> vec(size);
+
+		for (size_t i = 0; i < size; ++i)
+			vec[i] = array[i];
+
+		return vec;
+	}
+
+
+
 	/**
 	 *
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,7 +113,7 @@ namespace mex {
 	template<class T> class Handle
 	{
 	private:
-		mxArray* mxptr_;
+		const mxArray* mxptr_;
 
 	public:
 
@@ -111,20 +126,21 @@ namespace mex {
 		}
 
 		// constructor from mxArray*
-		Handle( mxArray* mxptr ) : mxptr_(mxptr) {}
+		// Handle( mxArray* mxptr ) : mxptr_(mxptr) {}
 
+		// construct from const pointers
 		Handle( const mxArray* mxptr ) : mxptr_(mxptr) {}
 
 		~Handle()
 		{
 			// invoke the destructor of the C++ class
-			delete (T*)(*this);
+			// delete (T*)(*this);
 			mexUnlock();
 		}
 
 		// conversion operators
 
-		inline operator mxArray*() { return mxptr_; }
+		inline operator const mxArray*() { return mxptr_; }
 
 		// inline explicit operator const mxArray*() { return mxptr_; }
 
