@@ -12,17 +12,19 @@
  * Released under the MIT license (see the accompanying LICENSE.md)
  */  
 
-
 #ifndef MEXUTILS_H
 #define MEXUTILS_H
 
 #include "mex.h"
 #include <typeinfo>
 
-// this is just an arbitrary hash that we'll use this to verify out classes
+// this is just an arbitrary hash that we'll use this to verify our classes
 #define CLASS_HANDLE_SIGNATURE 0xFF00F0A5
 
 namespace mex {
+
+	template<class T> class Base;
+	template<class T> class Handle;
 
 	/**
 	 *
@@ -50,41 +52,10 @@ namespace mex {
 
 	/**
 	 *
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * 				Base
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * Base class signature
+	 * marshall an mxArray* into a vector of a template type
 	 *
 	 */
-	template<class T> class Base
-	{
-	public:
-		Base(T *ptr) : name_m( typeid(T).name() ), ptr_m(ptr)
-		{ 
-			signature_m = CLASS_HANDLE_SIGNATURE; 
-		}
-
-		~Base() 
-		{ 
-			signature_m = 0; 
-			delete ptr_m; 
-		}
-
-		bool isValid() { 
-			return ((signature_m == CLASS_HANDLE_SIGNATURE) && !strcmp(name_m.c_str(), typeid(T).name())); 
-		}
-
-		T *ptr() {
-			return ptr_m; 
-		}
-	    
-	private:
-		uint32_t signature_m;
-		std::string name_m;
-		T *ptr_m;
-	};
-
-	template<class T> std::vector<T> getVector( const mxArray* mx )
+	template<class T> std::vector<T> mex2vector( const mxArray* mx )
 	{
 		T* array = (T*)mxGetData(mx);
 		size_t size = mxGetNumberOfElements(mx);
@@ -97,6 +68,50 @@ namespace mex {
 		return vec;
 	}
 
+	/**
+	 *
+	 * marshall a vector of a template type into an mxArray*
+	 *
+	 */
+	template<class T> mxArray* vector2mex( const std::vector<T> vec  )
+	{
+		mxArray * mx = mxCreateDoubleMatrix( vec.size(), 1, mxREAL );
+		double *mxptr = mxGetPr(mx);
+
+		for( auto it=vec.begin(); it!=vec.end(); ++it )
+			mxptr[ it - vec.begin() ] = (T)*it;
+
+		return mx;
+	}
+
+	/**
+	 *
+	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 * 				Base
+	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 * Base class signature
+	 *
+	 */
+	template<class T> class Base
+	{
+	public:
+		Base ( T *ptr ) : name_( typeid(T).name() ), ptr_(ptr)
+		{ 
+			signature_ = CLASS_HANDLE_SIGNATURE; 
+		}
+
+		~Base() { delete ptr_; }
+
+		bool isValid() { 
+			return ((signature_ == CLASS_HANDLE_SIGNATURE) && !strcmp(name_.c_str(), typeid(T).name())); 
+		}
+	    
+	private:
+		template<class U> friend class Handle;
+		uint32_t signature_;
+		std::string name_;
+		T *ptr_;
+	};
 
 
 	/**
@@ -113,51 +128,36 @@ namespace mex {
 	template<class T> class Handle
 	{
 	private:
-		const mxArray* mxptr_;
+		Base<T> *base_;
 
 	public:
 
+		Handle ( T* tptr ) { base_ = new Base<T>(tptr); }
+
 		// constructor from T*
-		Handle( T* cptr )
+		Handle ( const mxArray* mx )
 		{
-			mexLock();
-			mxptr_ = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
-			*((uint64_t *)mxGetData(mxptr_)) = reinterpret_cast<uint64_t>(new Base<T>(cptr));
+			if (mxGetNumberOfElements(mx) != 1 || mxGetClassID(mx) != mxUINT64_CLASS || mxIsComplex(mx))
+				mexErrMsgTxt("Input must be a real uint64 scalar.");
+			base_ = reinterpret_cast<Base<T> *>(*((uint64_t *)mxGetData(mx)));
+			if (!base_->isValid())
+				mexErrMsgTxt("Handle not valid.");
 		}
 
-		// constructor from mxArray*
-		// Handle( mxArray* mxptr ) : mxptr_(mxptr) {}
-
-		// construct from const pointers
-		Handle( const mxArray* mxptr ) : mxptr_(mxptr) {}
-
-		~Handle()
-		{
-			// invoke the destructor of the C++ class
-			// delete (T*)(*this);
-			mexUnlock();
+		~Handle() {
+			// mexUnlock();
 		}
 
 		// conversion operators
 
-		inline operator const mxArray*() { return mxptr_; }
-
-		// inline explicit operator const mxArray*() { return mxptr_; }
-
-		// inline operator mxArray*() { return mxptr_; }
-
-		inline operator Base<T>*() 
+		inline operator mxArray*() 
 		{
-			if (mxGetNumberOfElements(mxptr_) != 1 || mxGetClassID(mxptr_) != mxUINT64_CLASS || mxIsComplex(mxptr_))
-			    mexErrMsgTxt("Input must be a real uint64 scalar.");
-			Base<T> *ptr = reinterpret_cast<Base<T> *>(*((uint64_t *)mxGetData(mxptr_)));
-			if (!ptr->isValid())
-			    mexErrMsgTxt("Base not valid.");
-			return ptr;
+			mxArray *out = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
+			*((uint64_t *)mxGetData(out)) = reinterpret_cast<uint64_t>(base_);
+			return out;
 		}
 
-		inline operator T*() { return ((Base<T>*)(*this))->ptr(); }
-		
+		inline operator T* () {  return base_->ptr_; }
 	};
 
 }

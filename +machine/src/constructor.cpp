@@ -13,7 +13,7 @@
  */  
 
 #include <string>
-#include "../src/network.h"
+#include "network.h"
 #include "mex.h"
 #include "mexutils.h"
 
@@ -43,8 +43,20 @@ static constexpr unsigned int str2int(const char* str, int h = 0)
 class MexParameters : public machine::Network::Parameters
 {
 public:
-	MexParameters( const mxArray* params )
+	MexParameters( const mxArray* params ) 
 	{
+		// initialize defaults
+		this->inputs(3);
+		this->outputs(5);
+		this->hiddenLayers(1);
+		this->hiddenSize(4);
+		this->biasTerm(true);
+		this->rate(0.001);
+		this->activation(machine::sigmoid);
+		this->initialization(machine::random);
+		this->propogation(machine::dotprod);
+		this->training(machine::backPropogation);
+
 
 		if ( mxIsStruct( params ) )
 		{
@@ -63,7 +75,6 @@ public:
 				switch (str2int(fieldname))
 				{
 					case str2int("inputs") :
-						mexPrintf("inputs: %d\n",(int)m);
 						this->inputs((unsigned int)m);
 						break;
 					case str2int("outputs") :
@@ -160,10 +171,10 @@ public:
 
 
 /**
- * in Matlab, this function takes as parameters:
+ * in Matlab, this function takes the parameters:
  *		:param params - a matlab struct of parameters to the Network
  *
- * in C++, this function takes as parameters:
+ * in C++, this function takes the parameters:
  * 		:param nlhs - Number of output (left-side) arguments (the size of the plhs array)
  * 		:param plhs - Array of output arguments.
  * 		:param nrhs - Number of input (right-side) arguments (or the size of the prhs array)
@@ -178,13 +189,10 @@ void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	// if parameters are passed, build a network with those parameters
 	// otherwise, build a network with the default parameters
-	auto params = MexParameters( prhs[0] );
+	auto params = new MexParameters( prhs[0] );
+	// auto params = new machine::Network::Parameters();
 	auto net = new machine::Network(params);
 
-	const mxArray* a = (const mxArray*)mex::Handle<machine::Network>(net);
-
-	// this is a hack, but so is matlab; const_cast invokes undefined behavior
-	plhs[0] = const_cast<mxArray*>(a);
-
+	plhs[0] = mex::Handle<machine::Network>(net);
 }
 

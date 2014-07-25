@@ -26,7 +26,7 @@ namespace machine {
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 */
 	Network::Parameters::Parameters() 
-		: __inputs(3), __outputs(5), __hiddenLayers(1), __hiddenSize(0), __biasTerm(true), __rate(0.001), actf(sigmoid), initf(random) {}
+		: __inputs(3), __outputs(5), __hiddenLayers(1), __hiddenSize(4), __biasTerm(true), __rate(0.001), actf(sigmoid), initf(random), propf(dotprod), trainf(backPropogation) {}
 	
 	Network::Parameters::~Parameters() {}
 
@@ -98,10 +98,10 @@ namespace machine {
 	 * construct a network from a Parameters object
 	 *
 	 */
-	Network::Network ( const Network::Parameters& params ) : params(params), training(false)
+	Network::Network ( const Network::Parameters* params ) : params(params), training(false)
 	{
 		// initialize the layers
-		this->layers = std::vector<Network::Layer*>( this->params.__hiddenLayers + 2 );
+		this->layers = std::vector<Network::Layer*>( this->params->__hiddenLayers + 2 );
 
 		// for all but the input layer, the size of the weight vector is equal 
 		// to the number of neurons in the previous layer
@@ -111,12 +111,12 @@ namespace machine {
 
 			if ( it == this->layers.begin() ) // input layer
 			{
-				nNeurons = this->params.__inputs;
-				nWeights = this->params.__inputs;
+				nNeurons = this->params->__inputs;
+				nWeights = this->params->__inputs;
 			} 
 			else if ( it+1 == this->layers.end() ) // output layer
 			{
-				nNeurons = this->params.__outputs;
+				nNeurons = this->params->__outputs;
 				nWeights = (*(it-1))->nNeurons;
 			}
 			else // hidden layer
@@ -124,10 +124,10 @@ namespace machine {
 				// if the hiddenSize hasn't been set by the user, it should be set automatically.
 				// by default, the hidden size is equal to the floor of the mean of the number
 				// of inputs and outputs
-				if ( this->params.__hiddenSize )
-					nNeurons = this->params.__hiddenSize;
+				if ( this->params->__hiddenSize )
+					nNeurons = this->params->__hiddenSize;
 				else
-					nNeurons = (unsigned int)(( this->params.__inputs + this->params.__outputs) * 0.5);
+					nNeurons = (unsigned int)(( this->params->__inputs + this->params->__outputs) * 0.5);
 
 				nWeights = (*(it-1))->nNeurons;
 			}
@@ -137,19 +137,6 @@ namespace machine {
 		}
 	
 	}
-
-	/**
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * 					Network
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 *
-	 * construct a network from a saved binary file
-	 *
-	 */
-	Network::Network( std::string file, const Network::Parameters& params ) : params(params), training(false)
-	{
-		
-	};
 
 	Network::~Network(){};
 
@@ -208,13 +195,13 @@ namespace machine {
 	// call the propogation function
 	double Network::propogate ( std::vector<double> a, std::vector<double> b )
 	{
-		return (*this->params.propf)(a,b);
+		return (*this->params->propf)(a,b);
 	}
 
 	// call the initialization function
 	double Network::init ()
 	{
-		return (*this->params.initf)();
+		return (*this->params->initf)();
 	}
 
 	// call the training method of the trainer class
@@ -230,7 +217,7 @@ namespace machine {
 	// return the activation function
 	const ActFunction& Network::activate ()
 	{
-		return this->params.actf;
+		return this->params->actf;
 	}
 
 	// return the number of layers in the network
@@ -242,7 +229,7 @@ namespace machine {
 	// return the learning rate
 	double Network::rate ()
 	{
-		return this->params.__rate;
+		return this->params->__rate;
 	}
 
 	// toggle the training bool

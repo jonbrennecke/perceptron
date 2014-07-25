@@ -17,6 +17,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 							Artificial Neural Network Base Classes
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
  */
 
 #ifndef NETWORK_H
@@ -54,6 +55,7 @@ namespace machine {
 
 	// define 'act' as a shared pointer to an activation function
 	typedef std::shared_ptr<std::function<double(double)> > act_handle;
+	// typedef std::function<double(double)>* act_handle;
 
 	// factory function to create type 'act_handle' pointers
 	template <class F>
@@ -366,8 +368,7 @@ namespace machine {
 		// 	pointer ptr_;
 		// };
 
-		Network ( const Parameters& );
-		Network ( std::string, const Parameters& );
+		Network ( const Parameters* );
 		~Network();
 
 		std::vector<double> feedForward ( std::vector<double> );
@@ -395,8 +396,8 @@ namespace machine {
 		friend class Layer;
 		friend class Trainer;
 		
-		const Parameters& params;
-		std::vector<Layer*> layers; // TODO this should be Layer&
+		const Parameters* params;
+		std::vector<Layer*> layers;
 		train_handle trainf;
 		bool training;
 

@@ -35,7 +35,7 @@ classdef Network
 		function this = Network( params )
 
 			if ( exist('params','var') && isstruct(params) )
-				this.handle = machine.constructor(params);
+				this.handle = machine.build.constructor(params);
 			end
 
 		end
@@ -43,8 +43,12 @@ classdef Network
 		function train ()
 		end
 
-		function feedForward ( this, inputV )
-			machine.feedForward( this.handle, inputV );
+		% Feed the input vector forward through the network
+		% 
+		% :param inputV - input vector
+		% 
+		function outputV = feedForward ( this, inputV )
+			outputV = machine.build.feedForward( this.handle, inputV );
 		end
 
 	end % end methods

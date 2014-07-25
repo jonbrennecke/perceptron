@@ -13,16 +13,18 @@
  */  
 
 #include <string>
-#include "../src/network.h"
+#include "network.h"
 #include "mex.h"
 #include "mexutils.h"
 
 /**
- * in Matlab, this function takes as parameters:
+ * in Matlab, this function takes the parameters:
  * 		:param handle - a pointer to a C++ Network class
  *		:param inputV - input vector
+ * and returns
+ *		:return - the ouput vector of the network
  *
- * in C++, this function takes as parameters:
+ * in C++, this function takes the parameters:
  * 		:param nlhs - Number of output (left-side) arguments (the size of the plhs array)
  * 		:param plhs - Array of output arguments.
  * 		:param nrhs - Number of input (right-side) arguments (or the size of the prhs array)
@@ -35,13 +37,16 @@ void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 		// cast the mxArray* back to a Network*
 		auto handle = mex::Handle<machine::Network>(prhs[0]);
-		auto net = (machine::Network*)handle;
+		machine::Network* net = handle;
 
 		// cast the second argument into a vector
-		std::vector<double> v = mex::getVector<double>(prhs[1]);
+		std::vector<double> inputV = mex::mex2vector<double>(prhs[1]);
 
-		// 
-		net->feedForward(v);
+		// feed the input vector forward into the network
+		std::vector<double> output = net->feedForward(inputV);
+
+		// return the output vector
+		plhs[0] = mex::vector2mex<double>(output);
 	}
 
 }

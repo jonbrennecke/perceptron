@@ -80,7 +80,7 @@ namespace machine {
 	 */
 
 	// return the dot product of two vectors
-	// assumes that bot vectors are of the same size
+	// assumes that both vectors are the same size
 	double __dotprod ( std::vector<double> a, std::vector<double> b )
 	{
 		double c = 0;
