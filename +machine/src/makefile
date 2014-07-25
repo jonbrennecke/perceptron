@@ -12,7 +12,7 @@
 # Released under the MIT license (see the accompanying LICENSE.md)
 #  
 
-cxxfiles = constructor feedForward
+cxxfiles = constructor feedForward train invoke
 target_ext = mexmaci64
 build_dir = ../+build
 

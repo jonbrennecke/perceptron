@@ -1,4 +1,5 @@
 .waf*
 .lock*
-.mex*
+*.mex*
+*.o
 octave-workspace

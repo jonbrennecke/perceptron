@@ -55,7 +55,6 @@ namespace machine {
 
 	// define 'act' as a shared pointer to an activation function
 	typedef std::shared_ptr<std::function<double(double)> > act_handle;
-	// typedef std::function<double(double)>* act_handle;
 
 	// factory function to create type 'act_handle' pointers
 	template <class F>
@@ -138,12 +137,12 @@ namespace machine {
 	 * :param network { Network& } - the network to train
 	 */
 
-	typedef std::shared_ptr<std::function<void(std::vector<double>, std::vector<double>, Network&)> > train_handle;
+	typedef std::shared_ptr<std::function<std::vector<double>(std::vector<double>, std::vector<double>, Network&)> > train_handle;
 
 	// factory function to create type 'train_handle' function pointers
 	template <class F>
 	train_handle trainingFunctionFactory(F f) {
-	    return train_handle( new std::function<void(std::vector<double>, std::vector<double>, Network&)>(f) );
+	    return train_handle( new std::function<std::vector<double>(std::vector<double>, std::vector<double>, Network&)>(f) );
 	}
 
 	// the default training function
@@ -372,13 +371,13 @@ namespace machine {
 		~Network();
 
 		std::vector<double> feedForward ( std::vector<double> );
-		void train ( std::vector<double>, std::vector<double> );
+		std::vector<double> train ( std::vector<double>, std::vector<double> );
 		void toggleTrainingMode();
 		double propogate ( std::vector<double>, std::vector<double> );
 		const ActFunction& activate ();
 		double init ();
 		int size () const;
-		double rate ();
+		double rate () const;
 		void save ( std::string );
 		void load ( std::string );
 
@@ -398,7 +397,6 @@ namespace machine {
 		
 		const Parameters* params;
 		std::vector<Layer*> layers;
-		train_handle trainf;
 		bool training;
 
 	}; // end class Network

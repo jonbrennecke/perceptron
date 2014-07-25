@@ -49,14 +49,13 @@ public:
 		this->inputs(3);
 		this->outputs(5);
 		this->hiddenLayers(1);
-		this->hiddenSize(4);
+		this->hiddenSize(0);
 		this->biasTerm(true);
 		this->rate(0.001);
 		this->activation(machine::sigmoid);
 		this->initialization(machine::random);
 		this->propogation(machine::dotprod);
 		this->training(machine::backPropogation);
-
 
 		if ( mxIsStruct( params ) )
 		{

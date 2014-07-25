@@ -108,7 +108,7 @@ namespace machine {
 	 * Train the network by 'back propogation'
 	 * see http://en.wikipedia.org/wiki/Backpropagation
 	 */
-	void _backPropogation ( std::vector<double> input, std::vector<double> expected, Network& net )
+	std::vector<double> _backPropogation ( std::vector<double> input, std::vector<double> expected, Network& net )
 	{
 		// get the result of feeding the input into the network
 		std::vector<double> output = net.feedForward(input);
@@ -123,6 +123,7 @@ namespace machine {
 		// on for each layer.
 		for(auto layer = net.rbegin(); layer != net.rend(); ++layer)
 		{
+
 			// input and output for each layer
 			std::vector<double> layer_input = (*layer)->getInput();
 			std::vector<double> layer_output = (*layer)->getOutput();
@@ -149,6 +150,8 @@ namespace machine {
 			// recalculating the layer's output with the new weights
 			expected = (*layer)->feedForward( layer_input );
 		}
+
+		return expected;
 	}
 
 	auto backPropogation = trainingFunctionFactory( _backPropogation );

@@ -26,7 +26,7 @@ namespace machine {
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 */
 	Network::Parameters::Parameters() 
-		: __inputs(3), __outputs(5), __hiddenLayers(1), __hiddenSize(4), __biasTerm(true), __rate(0.001), actf(sigmoid), initf(random), propf(dotprod), trainf(backPropogation) {}
+		: __inputs(3), __outputs(5), __hiddenLayers(1), __hiddenSize(0), __biasTerm(true), __rate(0.001), actf(sigmoid), initf(random), propf(dotprod), trainf(backPropogation) {}
 	
 	Network::Parameters::~Parameters() {}
 
@@ -124,7 +124,7 @@ namespace machine {
 				// if the hiddenSize hasn't been set by the user, it should be set automatically.
 				// by default, the hidden size is equal to the floor of the mean of the number
 				// of inputs and outputs
-				if ( this->params->__hiddenSize )
+				if ( this->params->__hiddenSize != 0 )
 					nNeurons = this->params->__hiddenSize;
 				else
 					nNeurons = (unsigned int)(( this->params->__inputs + this->params->__outputs) * 0.5);
@@ -205,13 +205,13 @@ namespace machine {
 	}
 
 	// call the training method of the trainer class
-	void Network::train ( std::vector<double> input, std::vector<double> expected )
+	std::vector<double> Network::train ( std::vector<double> input, std::vector<double> expected )
 	{
 		// when the network is in 'training mode' the input to each neuron will be stored
 		if ( !this->training )
 			this->toggleTrainingMode();
 
-		(*this->trainf)( input, expected, *this );
+		return (*this->params->trainf)( input, expected, *this );
 	}
 
 	// return the activation function
@@ -227,7 +227,7 @@ namespace machine {
 	}
 
 	// return the learning rate
-	double Network::rate ()
+	double Network::rate () const
 	{
 		return this->params->__rate;
 	}
@@ -272,36 +272,17 @@ namespace machine {
 	Network::iterator::iterator( std::vector<pointer>::iterator it ) : it_(it) {}
 	Network::iterator::~iterator(){}	
 
-	Network::iterator::self_type Network::iterator::operator++() 
-	{
-		self_type i = *this; it_++; return i;
-	}
+	Network::iterator::self_type Network::iterator::operator++() { self_type i = *this; it_++; return i; }
 
-	Network::iterator::self_type Network::iterator::operator++( int i )
-	{
-		it_++; return *this;
-	}
+	Network::iterator::self_type Network::iterator::operator++( int i ) { it_++; return *this; }
 
-	Network::iterator::reference Network::iterator::operator*()
-	{
-		return *(*it_);
-	}
+	Network::iterator::reference Network::iterator::operator*() { return *(*it_); }
 
-	Network::iterator::pointer Network::iterator::operator->()
-	{
-		return *it_;
-	}
+	Network::iterator::pointer Network::iterator::operator->() { return *it_; }
 
-	bool Network::iterator::operator==(const Network::iterator::self_type& rhs)
-	{
-		return it_ == rhs.it_;
-	}
+	bool Network::iterator::operator==(const Network::iterator::self_type& rhs) { return it_ == rhs.it_; }
 
-	bool Network::iterator::operator!=(const Network::iterator::self_type& rhs)
-	{
-		return it_ != rhs.it_;
-	}
-
+	bool Network::iterator::operator!=(const Network::iterator::self_type& rhs) { return it_ != rhs.it_; }
 
 	/**
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -388,42 +369,24 @@ namespace machine {
 
 	/**
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * 					Network::iterator
+	 * 			Network::Layer::iterator
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 */
 
 	Network::Layer::iterator::iterator( std::vector<pointer>::iterator it ) : it_(it) {}
 	Network::Layer::iterator::~iterator(){}	
 
-	Network::Layer::iterator::self_type Network::Layer::iterator::operator++() 
-	{
-		self_type i = *this; it_++; return i;
-	}
+	Network::Layer::iterator::self_type Network::Layer::iterator::operator++() { self_type i = *this; it_++; return i; }
 
-	Network::Layer::iterator::self_type Network::Layer::iterator::operator++( int i )
-	{
-		it_++; return *this;
-	}
+	Network::Layer::iterator::self_type Network::Layer::iterator::operator++( int i ){ it_++; return *this; }
 
-	Network::Layer::iterator::reference Network::Layer::iterator::operator*()
-	{
-		return *(*it_);
-	}
+	Network::Layer::iterator::reference Network::Layer::iterator::operator*(){ return *(*it_); }
 
-	Network::Layer::iterator::pointer Network::Layer::iterator::operator->()
-	{
-		return *it_;
-	}
+	Network::Layer::iterator::pointer Network::Layer::iterator::operator->(){ return *it_; }
 
-	bool Network::Layer::iterator::operator==(const Network::Layer::iterator::self_type& rhs)
-	{
-		return it_ == rhs.it_;
-	}
+	bool Network::Layer::iterator::operator==(const Network::Layer::iterator::self_type& rhs){ return it_ == rhs.it_; }
 
-	bool Network::Layer::iterator::operator!=(const Network::Layer::iterator::self_type& rhs)
-	{
-		return it_ != rhs.it_;
-	}
+	bool Network::Layer::iterator::operator!=(const Network::Layer::iterator::self_type& rhs){ return it_ != rhs.it_; }
 
 	/**
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
