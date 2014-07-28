@@ -19,7 +19,7 @@
 % 
 classdef Network
 
-	properties (SetAccess = private)
+	properties (SetAccess = private, Hidden)
 		handle; % handle to the c++ instance
     end
 
