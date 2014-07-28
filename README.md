@@ -1,7 +1,7 @@
-The Machine
+Perceptron
 ===========
 
-A machine learning experiment in C++11, with wrappers for Matlab. 
+An experiment in "deep learning" multilayer perceptrons in C++11, with wrappers for Matlab. 
 
 ### installation
 The compilation procedure is pretty rudimentary at the moment; the only supported platform is OS X, since that's what it's being developed on.
